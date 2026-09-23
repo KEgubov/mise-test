@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, time, timedelta
 from unittest.mock import MagicMock
 
 import pytest
@@ -6,28 +6,47 @@ from httpx import AsyncClient, ASGITransport
 
 from main import app
 from src.api.dependency import get_booking_service, get_session
-from src.schemas.booking_schemas import BookingDTO
+from src.schemas.booking_schemas import BookingDTO, BookingListResponse
 
 
 @pytest.fixture
 def mock_booking_service():
     return MagicMock()
 
+
 @pytest.fixture
 def mock_session():
     return MagicMock()
 
+
 @pytest.fixture
-def mock_booking():
+def mock_booking_add_dto():
+    return {
+        "guest_name": "John",
+        "guest_phone": "+79999999999",
+        "booking_date": str(date.today() + timedelta(days=1)),
+        "booking_time": "14:00:00",
+        "guests": 1,
+    }
+
+
+@pytest.fixture
+def mock_booking_dto():
     return BookingDTO(
         booking_id=1,
         status="active",
         guest_name="John",
         guest_phone="+79999999999",
-        booking_date=date(2026, 9, 22),
+        booking_date=str(date.today() + timedelta(days=1)),
         booking_time=time(14, 00),
-        guests=1
+        guests=1,
     )
+
+
+@pytest.fixture
+def mock_booking_list(mock_booking_dto):
+    return BookingListResponse(bookings=[mock_booking_dto])
+
 
 @pytest.fixture
 def client(mock_booking_service, mock_session):
